@@ -9,6 +9,14 @@ const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(async (request, response) => {
     response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (request.method === 'OPTIONS') {
+        response.writeHead(200);
+        response.end();
+        return;
+    }
 
     if (request.url === '/api/jokes' && request.method === 'POST') {
         let data = '';
