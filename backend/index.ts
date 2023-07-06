@@ -15,11 +15,11 @@ const server = http.createServer(async (request, response) => {
         request.on('data', function (chunk) {
             data += chunk;
         });
-        request.on('end', function () {
-            addJoke(data);
+        request.on('end', async function () {
+            const joke = await addJoke(data);
+            response.writeHead(200);
+            response.end(JSON.stringify(joke));
         });
-        response.writeHead(200);
-        response.end();
     } else if (request.url === '/api/jokes' && request.method === 'GET') {
         getJokes()
             .then((allJokes) => {
@@ -103,8 +103,9 @@ async function getJokes(): Promise<IJoke[]> {
     }
 }
 
-async function addJoke(jokeFile: string) {
+async function addJoke(jokeFile: string): Promise<IJoke> {
     try {
+        console.log(jokeFile);
         const joke = JSON.parse(jokeFile) as IJoke;
         const dataPath = path.join(__dirname, "data");
         const data = path.join(dataPath, `${(await fs.promises.readdir(dataPath)).length}.json`);
@@ -112,6 +113,7 @@ async function addJoke(jokeFile: string) {
         joke.dislikes = 0;
 
         await fs.promises.writeFile(data, JSON.stringify(joke));
+        return joke;
     } catch (error) {
         console.error(error);
         throw error;
@@ -143,16 +145,3 @@ async function addLikesOrDislikes(params: { id: number }, check: boolean): Promi
     await fs.promises.writeFile(filePath, JSON.stringify(joke));
     return true;
 }
-
-
-  
-
-// {
-//     "compilerOptions": {
-//       "module": "es2020",
-//       "moduleResolution": "node",
-//       "outDir": "./dist",
-//       "target": "es6",
-//       "esModuleInterop": true
-//     }
-// }

@@ -1,0 +1,172 @@
+$bgc_color: rgba(175, 255, 231, 1);
+$main_color: rgba(41, 178, 255, 1);
+$text_color: rgba(255, 255, 255);
+$click_color: rgba(0, 102, 255, 1);
+$input_color: rgba(175, 255, 231, 0.4);
+* {
+    font-family: Impact;
+}
+header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: $main_color;
+    position: absolute;
+    width: 100%;
+    height: 8%;
+    top: 0;
+    left: 0;
+    color: $text_color;
+    z-index: 1;
+    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.25));
+}
+header h1 {
+    max-width: 60%;
+    font-size: 25px;
+    margin-left: 20px;
+}
+#icons a{
+    margin-right: 20px;
+    font-size: 40px;
+    text-decoration: none;
+}
+svg {
+    fill: $text_color;
+}
+nav {
+    display: flex;
+    flex-direction: column-reverse;
+    position: sticky;
+    top: 3%;
+    width: 100%;
+    height: 8%;
+    z-index: 1;
+    padding-bottom: 20px;
+}
+main {
+    position: absolute;
+    top: 10%;
+    width: 100%;
+}
+#click {
+    background-color: $click_color;
+    color: $text_color;
+    border: none;
+    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.25));
+    border-radius: 40px;
+    width: 96%;
+    height: 35px;
+    font-size: 25px;
+    cursor: pointer;
+}
+#inp_joke {
+    background-color: $input_color;
+    filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.25));
+    border: 2px solid rgb(172, 172, 172);
+    border-radius: 40px;
+    width: 96%;
+    min-height: 35px;
+    margin-top: 20px;
+    color: $click_color;
+    font-size: 25px;
+}
+#arrow {
+    background-color: rgba(0, 0, 0, 0);
+    width: 35px;
+    height: 35px;
+    position: absolute;
+    border: none;
+    right: 4%;
+    top: 60px;
+    z-index: 1;
+    cursor: pointer;
+}
+@media screen and (max-height: 600px) {
+    header{
+        height: 6%;
+    }
+    header h1 {
+        font-size: 17px;
+    }
+    #icons a {
+        font-size: 20px;
+    }
+}
+@media screen and (min-width: 850px){
+    nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        align-items: center;
+        position: sticky;
+        top: 3%;
+        width: 100%;
+        height: 8%;
+        z-index: 1;
+        padding-bottom: 20px;
+    }
+    nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: flex-end;
+        justify-content: center;
+    }
+    #click {
+        height: 50px;
+    }
+    #inp_joke {
+        height: 44px;
+        align-self: flex-start;
+        font-size: 30px;
+    }
+    #arrow {
+        z-index: 1;
+        width: 45px;
+        top: 27px;
+        left: 43.6%;
+        background-color: rgba(0, 0, 0, 0);
+    }
+    #jokes_block {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media screen and (min-width: 1200px){
+    #jokes_block {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .joke {
+        height: 400px;
+        width: 31%;
+    }
+    header {
+        height: 70px;
+    }
+    header h1{
+        font-size: 40px;
+    }
+    .ic {
+        height: 55px;
+    }
+    nav {
+        grid-template-columns: 2fr 1fr;
+    }
+    #click {
+        height: 60px;
+        font-size: 40px;
+
+    }
+    #inp_joke {
+        height: 54px;
+        font-size: 35px;
+    }
+    #arrow {
+        width: 55px;
+        position: absolute;
+        left: 60%;
+        top: 27px;
+        background-color: rgba(0, 0, 0, 0);
+    }
+}
