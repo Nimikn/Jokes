@@ -14,7 +14,7 @@ export class MainComponent implements OnInit{
       this.Jokes = jokes;
     })
   }
-  public Jokes: IJoke[] | undefined;
+  public Jokes: IJoke[] = [];
 
   addYourOwnJoke(){
     event?.preventDefault();
@@ -23,13 +23,14 @@ export class MainComponent implements OnInit{
       likes: 0,
       dislikes: 0
     }
+    this.Jokes = [...this.Jokes, inputValue]
     this.httpService.post<IJoke>("http://localhost:3000/api/jokes", inputValue).subscribe((newJoke)=>{
       console.log(newJoke);
       newJoke.content = inputValue.content;
     })
-    this.httpService.get<IJoke[]>("http://localhost:3000/api/jokes").subscribe((jokes)=>{
-      this.Jokes = jokes;
-    })
+    // this.httpService.get<IJoke[]>("http://localhost:3000/api/jokes").subscribe((jokes)=>{
+    //   this.Jokes = jokes;
+    // })
   }
   randomJoke() {
     let API = "https://api.chucknorris.io/jokes/random";
