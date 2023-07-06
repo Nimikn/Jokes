@@ -1,30 +1,29 @@
-import { IJoke } from "./models/IJoke";
-import path from "path";
-import fs from "fs";
-import http from "http";
-import url from "url";
+import { IJoke } from './models/IJoke';
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 
 const ENCODING = 'utf-8';
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer(async(request, response) => {
+const server = http.createServer(async (request, response) => {
     response.setHeader('Access-Control-Allow-Origin', '*');
 
-    if(request.url === '/api/jokes' && request.method === 'POST'){
+    if (request.url === '/api/jokes' && request.method === 'POST') {
         let data = '';
-        request.on('data', function (chunk){
+        request.on('data', function (chunk) {
             data += chunk;
         });
-        request.on('end', function (){
-            addJoke(data);
+        request.on('end', async function () {
+            const joke = await addJoke(data);
+            response.writeHead(200);
+            response.end(JSON.stringify(joke));
         });
-        response.writeHead(200);
-        response.end();
-    }
-    else if(request.url === '/api/jokes' && request.method === 'GET'){
+    } else if (request.url === '/api/jokes' && request.method === 'GET') {
         getJokes()
             .then((allJokes) => {
-                response.writeHead(200, { "Content-type": "text/json" });
+                response.writeHead(200, { 'Content-type': 'text/json' });
                 response.end(JSON.stringify(allJokes));
             })
             .catch((error) => {
@@ -32,6 +31,29 @@ const server = http.createServer(async(request, response) => {
                 response.writeHead(500);
                 response.end();
             });
+    } else if (request.url?.startsWith('/api/like') && request.method === 'PUT') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const params: any = url.parse(request.url, true).query;
+        if (await addLikesOrDislikes(params, true)) {
+            response.writeHead(200);
+            response.end();
+        } else {
+            response.writeHead(400);
+            response.end();
+        }
+    } else if (request.url?.startsWith('/api/dislike') && request.method === 'PUT') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const params: any = url.parse(request.url, true).query;
+        if (await addLikesOrDislikes(params, false)) {
+            response.writeHead(200);
+            response.end();
+        } else {
+            response.writeHead(400);
+            response.end();
+        }
+    } else {
+        response.writeHead(404);
+        response.end();
     }
 });
 
@@ -49,7 +71,7 @@ function readdirAsync(path: string): Promise<string[]> {
     });
 }
 
-function readFileAsync(path: string, encoding: string): Promise<string> {
+function readFileAsync(path: string): Promise<string> {
     return new Promise((resolve, reject) => {
         fs.readFile(path, ENCODING, (err, data) => {
             if (err) {
@@ -64,13 +86,13 @@ function readFileAsync(path: string, encoding: string): Promise<string> {
 async function getJokes(): Promise<IJoke[]> {
     try {
         let arrayJokes: IJoke[] = [];
-        let dataPath = path.join(__dirname, "data");
-        let data = await readdirAsync(dataPath);
+        const dataPath = path.join(__dirname, 'data');
+        const data = await readdirAsync(dataPath);
 
         for (let i = 0; i < data.length; i++) {
-            let pathToFile = path.join(dataPath, `${i}.json`);
-            let jokeString = await readFileAsync(pathToFile, "utf-8");
-            let joke: IJoke = JSON.parse(jokeString);
+            const pathToFile = path.join(dataPath, `${i}.json`);
+            const jokeString = await readFileAsync(pathToFile);
+            const joke: IJoke = JSON.parse(jokeString);
             arrayJokes = [...arrayJokes, joke];
         }
 
@@ -81,40 +103,45 @@ async function getJokes(): Promise<IJoke[]> {
     }
 }
 
-
-async function addJoke(jokeFile: string) {
+async function addJoke(jokeFile: string): Promise<IJoke> {
     try {
-        let joke = JSON.parse(jokeFile);
-        let dataPath = path.join(__dirname, "data");
-        let data = path.join(dataPath, `${fs.readdirSync(dataPath).length}.json`);
+        console.log(jokeFile);
+        const joke = JSON.parse(jokeFile) as IJoke;
+        const dataPath = path.join(__dirname, "data");
+        const data = path.join(dataPath, `${(await fs.promises.readdir(dataPath)).length}.json`);
         joke.likes = 0;
         joke.dislikes = 0;
 
-        await new Promise<void>((resolve, reject) => {
-            fs.writeFile(data, JSON.stringify(joke), (err) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-        });
+        await fs.promises.writeFile(data, JSON.stringify(joke));
+        return joke;
     } catch (error) {
         console.error(error);
         throw error;
     }
 }
 
-function addLike() {
-    
-}
+async function addLikesOrDislikes(params: { id: number }, check: boolean): Promise<boolean> {
+    if (isNaN(params.id)) {
+        return false;
+    }
 
-// {
-//     "compilerOptions": {
-//       "module": "es2020",
-//       "moduleResolution": "node",
-//       "outDir": "./dist",
-//       "target": "es6",
-//       "esModuleInterop": true
-//     }
-// }
+    const dataPath = path.join(__dirname, 'data');
+    const jokesNum = (await fs.promises.readdir(dataPath)).length;
+
+    if (params.id < 0 || params.id >= jokesNum) {
+        return false;
+    }
+
+    const filePath = path.join(dataPath, `${params.id}.json`);
+    const jokeString = await readFileAsync(filePath);
+    const joke = JSON.parse(jokeString) as IJoke;
+
+    if (check) {
+        joke.likes++;
+    } else {
+        joke.dislikes++;
+    }
+
+    await fs.promises.writeFile(filePath, JSON.stringify(joke));
+    return true;
+}

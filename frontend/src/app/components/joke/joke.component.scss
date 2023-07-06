@@ -1,0 +1,53 @@
+$bgc_color: rgba(175, 255, 231, 1);
+$main_color: rgba(41, 178, 255, 1);
+$text_color: rgba(255, 255, 255);
+$click_color: rgba(0, 102, 255, 1);
+$input_color: rgba(175, 255, 231, 0.4);
+* {
+    font-family: Impact;
+}
+.joke {
+    background-color: $main_color;
+    color: $text_color;
+    width: 96%;
+    min-height: 200px;
+    border: none;
+    border-radius: 40px;
+    font-size: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+.joke_text {
+    width: 90%;
+    align-self: center;
+}
+.ic {
+    height: 25px;
+    cursor: pointer;
+}
+path{
+    fill: $text_color;
+}
+path:focus {
+    fill: $click_color;
+}
+.like_dislike {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 200px;
+    font-size: 25px;
+    margin-left: 5%;
+
+}
+button {
+    background-color: rgba(0, 102, 255, 0);
+    border: none;
+}
+@media screen and (min-width: 900px){
+    * {
+        font-size: 25px;
+    }
+}
