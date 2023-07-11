@@ -39,8 +39,5 @@ export class JokeComponent {
     this.httpService.delete<any>(`http://localhost:3000/api/jokes/${jokeId}`).subscribe(() => {
       this.jokes = this.jokes.filter(joke => joke.id !== jokeId);
     });
-    // this.httpService.get<IJoke[]>('http://localhost:3000/api/jokes').subscribe((response) => {
-    //   this.jokes = response;
-    // });
   }
 }
