@@ -8,43 +8,51 @@ import { HttpService } from 'src/app/services/http.service';
   styleUrls: ['./main.component.scss']
 })
 export class MainComponent implements OnInit{
+
   constructor (private httpService: HttpService){}
+
   ngOnInit(): void {
     this.httpService.get<IJoke[]>('http://localhost:3000/api/jokes').subscribe((jokes) =>{
       this.Jokes = jokes;
     })
   }
+
   public Jokes: IJoke[] = [];
 
-  addYourOwnJoke(){
+  addYourOwnJoke() {
     event?.preventDefault();
     const inputValue: IJoke = {
       content: (<HTMLInputElement>document.getElementById("inp_joke")).value,
       likes: 0,
-      dislikes: 0
+      dislikes: 0,
+      id: 0
     }
-    this.Jokes = [...this.Jokes, inputValue]
-    this.httpService.post<IJoke>("http://localhost:3000/api/jokes", inputValue).subscribe((newJoke)=>{
-      console.log(newJoke);
-      newJoke.content = inputValue.content;
-    })
-    // this.httpService.get<IJoke[]>("http://localhost:3000/api/jokes").subscribe((jokes)=>{
-    //   this.Jokes = jokes;
-    // })
+    if(inputValue.content){
+      this.Jokes = [...this.Jokes, inputValue];
+      this.httpService.post<IJoke>("http://localhost:3000/api/jokes", inputValue).subscribe((newJoke)=>{
+        newJoke.content = inputValue.content;
+      })
+      this.httpService.get<IJoke[]>("http://localhost:3000/api/jokes").subscribe((jokes)=>{
+        this.Jokes = jokes;
+      })
+    }
   }
+
   randomJoke() {
-    let API = "https://api.chucknorris.io/jokes/random";
+    const API = "https://api.chucknorris.io/jokes/random";
     this.httpService.get<any>(API).subscribe((joke)=>{
       const readyToSendJoke: IJoke = {
-        content: joke.joke as string,
+        content: joke.value,
         likes: 0,
-        dislikes: 0
+        dislikes: 0,
+        id: 0
       }
-      this.httpService.post<IJoke>("http://localhost:3000/api/jokes", readyToSendJoke).subscribe((returnedJoke)=>{
-        console.log(readyToSendJoke);
-        console.log(returnedJoke);
+      this.httpService.post<IJoke>("http://localhost:3000/api/jokes", readyToSendJoke).subscribe((returnedJoke: IJoke)=>{
+        console.log(returnedJoke.id);
+      })
+      this.httpService.get<IJoke[]>("http://localhost:3000/api/jokes").subscribe((jokes)=>{
+        this.Jokes = jokes;
       })
     })
   }
-
 }

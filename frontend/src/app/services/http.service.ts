@@ -21,4 +21,8 @@ export class HttpService {
   put<T>(url: string, body: any): Observable<T> {
     return this.client.put<T>(url, body);
   }
+
+  delete<T>(url: string): Observable<T> {
+    return this.client.delete<T>(url);
+  }
 }

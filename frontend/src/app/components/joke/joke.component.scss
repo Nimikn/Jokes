@@ -12,16 +12,24 @@ $input_color: rgba(175, 255, 231, 0.4);
     width: 96%;
     min-height: 200px;
     border: none;
-    border-radius: 40px;
+    border-radius: 45px;
     font-size: 20px;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
     margin-bottom: 20px;
+    position: relative;
 }
 .joke_text {
     width: 90%;
     align-self: center;
+}
+.delete {
+    position: absolute;
+    right: 5%;
+    bottom: 13%;
+    font-size: x-large;
+    // font-size: small;
 }
 .ic {
     height: 25px;
@@ -49,5 +57,16 @@ button {
 @media screen and (min-width: 900px){
     * {
         font-size: 25px;
+    }
+    .delete{
+        margin-right: 6%;
+        margin-top: 2%;
+    }
+}
+@media screen and (min-width: 850px){
+    .delete {
+        position: absolute;
+        bottom: 13.5%;
+        right: 2%;
     }
 }

@@ -59,6 +59,22 @@ const server = http.createServer(async (request, response) => {
             response.writeHead(400);
             response.end();
         }
+    } else if (request.url?.startsWith(`/api/jokes`) && request.method === 'DELETE') {
+        const jokeId = parseInt(request.url.split('/').pop() || '', 10);
+        if (isNaN(jokeId)) {
+            response.writeHead(400);
+            response.end();
+            return;
+        }
+    
+        const deleted = await deleteJoke(jokeId);
+        if (deleted) {
+            response.writeHead(200);
+            response.end();
+        } else {
+            response.writeHead(404);
+            response.end();
+        }
     } else {
         response.writeHead(404);
         response.end();
@@ -113,43 +129,77 @@ async function getJokes(): Promise<IJoke[]> {
 
 async function addJoke(jokeFile: string): Promise<IJoke> {
     try {
-        console.log(jokeFile);
-        const joke = JSON.parse(jokeFile) as IJoke;
-        const dataPath = path.join(__dirname, "data");
-        const data = path.join(dataPath, `${(await fs.promises.readdir(dataPath)).length}.json`);
-        joke.likes = 0;
-        joke.dislikes = 0;
+      const joke: IJoke = JSON.parse(jokeFile) as IJoke;
+      const dataPath = path.join(__dirname, "data");
+      const jokeId = (await fs.promises.readdir(dataPath)).length;
+      const filePath = path.join(dataPath, `${jokeId}.json`);
+      joke.id = jokeId;
+      joke.likes = 0;
+      joke.dislikes = 0;
 
-        await fs.promises.writeFile(data, JSON.stringify(joke));
-        return joke;
+      await fs.promises.writeFile(filePath, JSON.stringify(joke));
+      return joke;
     } catch (error) {
-        console.error(error);
-        throw error;
+      console.error(error);
+      throw error;
     }
-}
+  }
+  
 
-async function addLikesOrDislikes(params: { id: number }, check: boolean): Promise<boolean> {
-    if (isNaN(params.id)) {
-        return false;
+    async function addLikesOrDislikes(params: { id: number }, check: boolean): Promise<boolean> {
+        if (isNaN(params.id)) {
+            return false;
+        }
+
+        const dataPath = path.join(__dirname, 'data');
+        const jokeId = params.id;
+        const jokesNum = (await fs.promises.readdir(dataPath)).length;
+
+        if (jokeId < 0 || jokeId >= jokesNum) {
+            return false;
+        }
+
+        const filePath = path.join(dataPath, `${jokeId}.json`);
+        const jokeString = await readFileAsync(filePath);
+        const joke = JSON.parse(jokeString) as IJoke;
+
+        if (check) {
+            joke.likes++;
+        } else {
+            joke.dislikes++;
+        }
+
+        await fs.promises.writeFile(filePath, JSON.stringify(joke));
+        return true;
     }
 
-    const dataPath = path.join(__dirname, 'data');
-    const jokesNum = (await fs.promises.readdir(dataPath)).length;
+    async function deleteJoke(jokeId: number): Promise<boolean> {
+        try {
+          const dataPath = path.join(__dirname, 'data');
+          const jokes = await getJokes();
+          const jokesNum = jokes.length;
+      
+          if (jokeId < 0 || jokeId >= jokesNum) {
+            return false;
+          }
+      
+          const filePath = path.join(dataPath, `${jokeId}.json`);
+          await fs.promises.unlink(filePath);
 
-    if (params.id < 0 || params.id >= jokesNum) {
-        return false;
-    }
+          for (let i = jokeId + 1; i < jokesNum; i++) {
+            const oldFilePath = path.join(dataPath, `${i}.json`);
+            const newFilePath = path.join(dataPath, `${i - 1}.json`);
+            await fs.promises.rename(oldFilePath, newFilePath);
 
-    const filePath = path.join(dataPath, `${params.id}.json`);
-    const jokeString = await readFileAsync(filePath);
-    const joke = JSON.parse(jokeString) as IJoke;
-
-    if (check) {
-        joke.likes++;
-    } else {
-        joke.dislikes++;
-    }
-
-    await fs.promises.writeFile(filePath, JSON.stringify(joke));
-    return true;
-}
+            const joke = jokes[i];
+            joke.id = i - 1;
+            await fs.promises.writeFile(newFilePath, JSON.stringify(joke));
+          }
+      
+          return true;
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+      }
+      
