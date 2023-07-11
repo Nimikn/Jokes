@@ -35,9 +35,10 @@ export class JokeComponent {
   }
 
   deleteJoke(jokeId: number) {
-    
+    console.log(this.jokes);
+    this.jokes = this.jokes.filter(joke => joke.id !== jokeId);
     this.httpService.delete<any>(`http://localhost:3000/api/jokes/${jokeId}`).subscribe(() => {
-      this.jokes = this.jokes.filter(joke => joke.id !== jokeId);
     });
+    console.log(this.jokes);
   }
 }
