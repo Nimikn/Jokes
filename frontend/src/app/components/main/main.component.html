@@ -21,6 +21,7 @@
     <app-joke
     *ngFor="let joke of Jokes"
     [joke]="joke"
+    (onDeleted)="onDeleted($event)"
     ></app-joke>
   </div>
 </main>

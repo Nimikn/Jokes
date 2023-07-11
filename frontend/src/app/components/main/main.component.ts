@@ -55,4 +55,8 @@ export class MainComponent implements OnInit{
       })
     })
   }
+
+  onDeleted(id: number) {
+    this.Jokes = this.Jokes.filter(joke => joke.id != id);
+  }
 }
