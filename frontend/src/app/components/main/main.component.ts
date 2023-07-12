@@ -36,6 +36,7 @@ export class MainComponent implements OnInit{
         this.Jokes = jokes;
       })
     }
+    (<HTMLInputElement>document.getElementById("inp_joke")).value = '';
   }
 
   randomJoke() {

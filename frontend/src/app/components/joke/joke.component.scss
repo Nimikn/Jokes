@@ -10,7 +10,9 @@ $input_color: rgba(175, 255, 231, 0.4);
     background-color: $main_color;
     color: $text_color;
     width: 96%;
+    // height: 200px;   
     min-height: 200px;
+    max-height: 250px;
     border: none;
     border-radius: 45px;
     font-size: 20px;
@@ -23,6 +25,7 @@ $input_color: rgba(175, 255, 231, 0.4);
 .joke_text {
     width: 90%;
     align-self: center;
+    text-overflow: ellipsis;
 }
 .delete {
     position: absolute;
